@@ -11,7 +11,6 @@ import java.awt.FlowLayout;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.GridLayout;
-import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ComponentAdapter;
@@ -157,17 +156,14 @@ public class RenderGUI {
 		
 		g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.4f));
 		g.setPaint(Color.GREEN);
-		g.setStroke(new BasicStroke(0.5f));
+		g.setStroke(new BasicStroke(0f));
 		
-//		int left = (int)(params.crop.getX()*params.w);
-//		int top = (int)(params.crop.getY()*params.h);
-//		int width = (int)(params.crop.getWidth()*params.w);
-//		int height = (int)(params.crop.getHeight()*params.h);
+		int imgWidth = img.getWidth();
+		int imgHeight = img.getHeight();
+
+		g.scale(imgWidth, imgHeight);
 		
-//		int imgWidth = img.getWidth();
-//		int imgHeight = img.getHeight();
-		
-		double left = params.crop.getX();
+		double left = params.crop.getX(); 
 		double top = params.crop.getY();
 		double width = params.crop.getWidth();
 		double height = params.crop.getHeight();
@@ -178,7 +174,11 @@ public class RenderGUI {
 		g.fill(new Rectangle2D.Double(0, top+height, 1, 1-height-top));
 
 		g.setPaint(Color.RED);
-		g.draw(params.crop);
+		g.draw(new Rectangle2D.Double(
+				params.crop.getX(), 
+				params.crop.getY(),
+				params.crop.getWidth(),
+				params.crop.getHeight()));
 	}
 	
 	public Component createDisplay() {
@@ -213,15 +213,10 @@ public class RenderGUI {
 	}
 	
 	public void setCropFactor(float left, float top, float right, float bottom) {
-		int l = (int)(params.w*left);
-		int r = (int)(params.w*right);
-		int t = (int)(params.h*top);
-		int b = (int)(params.h*bottom);
+		float w = Math.max(right-left, 0);
+		float h = Math.max(bottom-top, 0);
 		
-		int w = Math.max(r-l, 0);
-		int h = Math.max(b-t, 0);
-		
-		params.crop = new Rectangle(l, t, w, h);
+		params.crop = new Rectangle2D.Float(left, top, w, h);
 		
 		invalidateBuffer();
 	}
