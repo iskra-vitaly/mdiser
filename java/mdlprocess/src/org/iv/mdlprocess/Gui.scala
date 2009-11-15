@@ -2,7 +2,7 @@ package org.iv.mdlprocess
 
 import javax.swing._;
 import filechooser.FileFilter;
-import java.io.{File, FilenameFilter};
+import java.io.{File, FilenameFilter, BufferedOutputStream, FileOutputStream};
 import java.awt.event._;
 import java.awt.{BorderLayout}
 import org.iv.mdlprocess.engine._;
@@ -28,39 +28,66 @@ object Gui {
                                      return name.endsWith(".xml");
                                    } 
                                  }); 
-    processFiles(files.toList);
+    showFileGui(files.toList);
   }
   
-  def processFiles(files: List[File]):Unit = files match {
-    case f :: tail => {
-      val windowListener = new WindowAdapter {
-        override def windowClosing (e:WindowEvent) {
-          e.getWindow().dispose();
-        }
-        
-        override def windowClosed (e:WindowEvent) {
-          processFiles(tail);
-        }
-      } 
-      showFileGui(f, windowListener)
-    }
-    case Nil => println("Done") 
-  }
-  
-  def showFileGui(f:File, l:WindowListener) {
-    val figure = ProcessFile.readXmlFile(new File("/media/e/VDiser/Zhang.review/work/cara1_abajo.xml"));
-    val gui = new RenderGUI(800, 600, figure)
-    var frame = new JFrame;
-    frame.addWindowListener(l)
-    val pane = frame.getContentPane()
-    pane.setLayout(new BorderLayout)
-    pane add gui.createDisplay
-    frame.pack();
-    frame.setVisible(true);
+  def createCloseFrame(frame:java.awt.Window) = {
+    val closeFrame = new JFrame
+    val closeButton = new JButton("close")
+    closeButton.addActionListener(
+      new ActionListener{override def actionPerformed(e:ActionEvent) = frame.dispose}
+    )
     
-    val toolbar = RenderGUI.createToolFrame(gui);
-    toolbar pack;
-    toolbar.setVisible(true)
-    toolbar.addWindowListener(l);
+    frame.addWindowListener(
+      new WindowAdapter{override def windowClosed(e:WindowEvent) = closeFrame.dispose}
+    );
+    frame.pack
+    frame
+  }
+  
+  def showFileGui(files:List[File]):Unit = files match {
+    case f :: tail => {
+	  println("Processing "+f);
+	  val figure = ProcessFile.readXmlFile(f);
+	  val gui = createNewGui()(figure)
+	  val frame = new JFrame;
+	  val pane = frame.getContentPane()
+	  pane.setLayout(new BorderLayout)
+	  pane add gui.createDisplay
+	  frame.pack
+	  frame.setVisible(true);
+	  frame.setLocation(500, 10);
+
+	  val toolbar = RenderGUI.createToolFrame(gui)
+	  toolbar.pack
+	  toolbar.setVisible(true)
+
+	  toolbar.addWindowListener(
+			  new WindowAdapter{
+				  override def windowClosed(e:WindowEvent) = {
+					saveSettings(f, gui)
+					frame.dispose()
+					showFileGui(tail)
+				  }
+
+				  override def windowClosing(e:WindowEvent) = toolbar.dispose
+			  }
+	  )
+
+	  frame.addWindowListener(new WindowAdapter{override def windowClosing(e:WindowEvent) = toolbar.dispose})
+    }
+    case Nil => println("done");
   } 
+  
+  def saveSettings(figureFile:File, gui:RenderGUI) {
+    gui.saveParams(new File(figureFile.getAbsolutePath() + ".xform-params"))
+    params = Some(gui.params)
+  }
+  
+  var params:Option[ProcessFile.Params] = None;
+  
+  def createNewGui() = params match {
+    case Some(p:ProcessFile.Params) => new RenderGUI(_:ProcessFile.Figure, p)
+    case None => new RenderGUI(150, 200, _:ProcessFile.Figure)
+  }
 }

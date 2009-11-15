@@ -1,6 +1,6 @@
 package org.iv.mdlprocess.engine;
 
-import java.awt.Rectangle;
+import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.Serializable;
@@ -96,14 +96,14 @@ public class ProcessFile {
 		public int w;
 		public int h;
 		public Transform xform;
-		public Rectangle crop;
+		public Rectangle2D crop;
 
-		public Params(int w, int h, Transform xform, Rectangle crop) {
+		public Params(int w, int h, Transform xform, Rectangle2D crop) {
 			super();
 			this.xform = xform != null ? xform : Transform.IDENTITY;
 			this.w = w;
 			this.h = h;
-			this.crop = crop != null ? crop : new Rectangle(0, 0, w, h);
+			this.crop = crop != null ? crop : new Rectangle2D.Float(0, 0, 1, 1);
 		}
 
 		public Params(int w, int h) {
@@ -122,7 +122,7 @@ public class ProcessFile {
 			return xform;
 		}
 
-		public Rectangle getCrop() {
+		public Rectangle2D getCrop() {
 			return crop;
 		}
 	}
@@ -188,7 +188,11 @@ public class ProcessFile {
 
 		renderer.ensureNornamls();
 		renderer.renderBuffer(params.w, params.h);
-		return renderer.createImage(params.crop.x, params.crop.y, params.crop.width, params.crop.height);
+		int cx = (int)(params.crop.getX()*params.w);
+		int cy = (int)(params.crop.getY()*params.h);
+		int cw = (int)(params.crop.getWidth()*params.w);
+		int ch = (int)(params.crop.getHeight()*params.h);
+		return renderer.createImage(cx, cy, cw, ch);
 	}
 
 	public static void main(String argv[]) {

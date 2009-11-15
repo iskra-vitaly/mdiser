@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- ====================================================================== 
+     Nov 15, 2009 1:55:30 PM                                                        
+
+     mdlprocess    
+     processor of wrl face file converted to xml
+                   
+     vitalik                                                                
+     ====================================================================== -->
+<project name="mdlprocess" default="default">
+    <description>
+            processor of wrl face file converted to xml
+    </description>
+
+
+	<property name="src.dir" location="${basedir}/src"/>
+	<property name="bin.dir" location="${basedir}/bin"/>
+	<property name="dst.dir" location="${basedir}/dist"/>
+	<property name="dist.jar.name" value="${ant.project.name}.jar"/>
+	
+	<property name="scala.home" location="${eclipse.home.location}/plugins"/>
+	<property name="scala.lib" location="${scala.home}/scala.library_2.7.7.final.jar"/>
+	<!-- ================================= 
+          target: default              
+         ================================= -->
+    <target name="default" depends="jar" description="processor of wrl face file converted to xml">
+        
+    </target>
+	
+	<path id="build.cp">
+		<pathelement location="${scala.lib}"/>
+		<pathelement location="${bin.dir}" />
+	</path>
+
+    <!-- ================================= 
+          target: jar                      
+         ================================= -->
+    <target name="jar" description="Project jar package">
+    	<mkdir dir="${dst.dir}"/>
+    	<jar basedir="${bin.dir}" destfile="${dst.dir}/${dist.jar.name}" compress="no">
+    		<include name="**/*.class"/>
+    		<include name="**/*.properties"/>
+    		<include name="**/*.conf"/>
+   		</jar>
+    	<copy tofile="${dst.dir}/scala-library.jar" file="${scala.lib}"/>
+    </target>
+
+	<!-- ================================= 
+          target: compile              
+         ================================= -->
+    <target name="compile" depends="init" description="compile sources">
+    	<mkdir dir="${bin.dir}"/>
+    	<scalac srcdir="${src.dir}" destdir="${bin.dir}" classpathref="build.cp">
+    		<include name="**/*.scala" />
+    		<include name="**/*.java" />
+    	</scalac>
+    </target>
+
+	<!-- - - - - - - - - - - - - - - - - - 
+          target: init                      
+         - - - - - - - - - - - - - - - - - -->
+    <target name="init">
+    	<taskdef resource="scala/tools/ant/antlib.xml" >
+    		<classpath>
+    			<pathelement location="${scala.lib}"/>
+    			<pathelement location="${scala.home}/scala.tools.nsc_2.7.7.final.jar"/>
+    		</classpath>
+    	</taskdef>
+    </target>
+	
+	<target name="clean">
+		<delete dir="${dst.dir}" />
+		<delete dir="${bin.dir}" />
+	</target>
+
+</project>

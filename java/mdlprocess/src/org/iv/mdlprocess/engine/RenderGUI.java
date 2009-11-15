@@ -16,6 +16,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
+import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.io.BufferedOutputStream;
 import java.io.File;
@@ -158,18 +159,23 @@ public class RenderGUI {
 		g.setPaint(Color.GREEN);
 		g.setStroke(new BasicStroke(0.5f));
 		
-		int left = params.crop.x;
-		int top = params.crop.y;
-		int width = params.crop.width;
-		int height = params.crop.height;
+//		int left = (int)(params.crop.getX()*params.w);
+//		int top = (int)(params.crop.getY()*params.h);
+//		int width = (int)(params.crop.getWidth()*params.w);
+//		int height = (int)(params.crop.getHeight()*params.h);
 		
-		int imgWidth = img.getWidth();
-		int imgHeight = img.getHeight();
+//		int imgWidth = img.getWidth();
+//		int imgHeight = img.getHeight();
 		
-		g.fill(new Rectangle(0, 0, imgWidth, top));
-		g.fill(new Rectangle(0, top, left, height));
-		g.fill(new Rectangle(left+width, top, imgWidth-left-width, height));
-		g.fill(new Rectangle(0, top+height, imgWidth, imgHeight-height-top));
+		double left = params.crop.getX();
+		double top = params.crop.getY();
+		double width = params.crop.getWidth();
+		double height = params.crop.getHeight();
+		
+		g.fill(new Rectangle2D.Double(0, 0, 1, top));
+		g.fill(new Rectangle2D.Double(0, top, left, height));
+		g.fill(new Rectangle2D.Double(left+width, top, 1-left-width, height));
+		g.fill(new Rectangle2D.Double(0, top+height, 1, 1-height-top));
 
 		g.setPaint(Color.RED);
 		g.draw(params.crop);
