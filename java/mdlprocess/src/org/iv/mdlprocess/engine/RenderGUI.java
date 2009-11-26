@@ -249,10 +249,10 @@ public class RenderGUI {
 		
 		pane.add(new JLabel("Crop"));
 		
-		final JSlider left = new JSlider(0, 1000, 0);
-		final JSlider right = new JSlider(0, 1000, 1000);
-		final JSlider top = new JSlider(0, 1000, 0);
-		final JSlider bottom = new JSlider(0, 1000, 1000);
+		final JSlider left = new JSlider(0, 1000, (int)(gui.params.crop.getX()*1000));
+		final JSlider right = new JSlider(0, 1000, (int)(gui.params.crop.getMaxX()*1000));
+		final JSlider top = new JSlider(0, 1000, (int)(gui.params.crop.getY()*1000));
+		final JSlider bottom = new JSlider(0, 1000, (int)(gui.params.crop.getMaxY()*1000));
 		final JSlider[] sliders = {left, right, top, bottom};
 		
 		ChangeListener cropListaner = new ChangeListener() {

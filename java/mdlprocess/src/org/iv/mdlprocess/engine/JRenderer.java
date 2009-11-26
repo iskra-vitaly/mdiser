@@ -214,16 +214,16 @@ public class JRenderer {
 		float[] color = {gray};
 		float []frgb = cspace.toRGB(color);
 		int rgb = 0xff000000
-			|((int)(frgb[0]*255)<<16)
-			|((int)(frgb[1]*255)<<8)
-			|((int)(frgb[2]*255));
+			|(Math.round(frgb[0]*255)<<16)
+			|(Math.round(frgb[1]*255)<<8)
+			|(Math.round(frgb[2]*255));
 		return rgb;
 	}
 	
 	public BufferedImage createImage(int srcX, int srcY, int w, int h) {
 		ensureNornamls();
 		
-		BufferedImage img = new BufferedImage(w, h, BufferedImage.TYPE_BYTE_GRAY);
+		BufferedImage img = new BufferedImage(w, h, BufferedImage.TYPE_USHORT_GRAY);
 		ColorSpace cspace = img.getColorModel().getColorSpace();
 		
 		for (int y = 0; y<h; y++) for (int x = 0; x<w; x++) {
@@ -234,6 +234,16 @@ public class JRenderer {
 		}
 		
 		return img;
+	}
+	
+	public float[][][] getNormals(int srcX, int srcY, int w, int h) {
+		ensureNornamls();
+		float[][][] res = new float[3][h][w];
+		for (int y = 0; y<h; y++) for (int x = 0; x<w; x++) {
+			int ni = ibuffer[srcY+y][srcX + x];
+			for (int i=0; i<3; i++) res[i][y][x] = (float)normals[ni][i]; 
+		}
+		return res;
 	}
 	
 	public BufferedImage createDumbImage(int w, int h) {

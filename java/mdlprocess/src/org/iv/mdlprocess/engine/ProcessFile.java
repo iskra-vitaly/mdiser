@@ -176,6 +176,26 @@ public class ProcessFile {
 		return processData(readXmlFile(file), params);
 	}
 
+	public static float[][][] calculateNormals(Figure figure, Params params) {
+		double[][] pts = new double[figure.points.getLength()][];
+		int n = figure.points.getLength();
+		for (int i=0; i<n; i++) {
+			pts[i] = new double[]{figure.points.getX(i), figure.points.getY(i), figure.points.getZ(i), 1};
+		}
+		Array3D pointsTransformed = new Array3D(params.xform.apply(pts));
+
+		JRenderer renderer = new JRenderer(pointsTransformed, figure.meshes);
+
+		renderer.ensureNornamls();
+		renderer.renderBuffer(params.w, params.h);
+		int cx = (int)(params.crop.getX()*params.w);
+		int cy = (int)(params.crop.getY()*params.h);
+		int cw = (int)(params.crop.getWidth()*params.w);
+		int ch = (int)(params.crop.getHeight()*params.h);
+		
+		return renderer.getNormals(cx, cy, cw, ch);
+	}
+	
 	public static BufferedImage processData(Figure figure, Params params) {
 		double[][] pts = new double[figure.points.getLength()][];
 		int n = figure.points.getLength();
