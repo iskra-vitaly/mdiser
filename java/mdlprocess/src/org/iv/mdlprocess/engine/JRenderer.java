@@ -60,7 +60,6 @@ public class JRenderer {
 			double ny = z1*(x2 - x3) + z2*(x3 - x1) + z3*(x1 - x2);
 			double nz = x1*(y2 - y3) + x2*(y3 - y1) + x3*(y1 - y2);
 			
-			
 			normals[i][0] = nx; normals[i][1] = ny; normals[i][2] = nz;
 
 			double nlen = Math.sqrt(nx*nx+ny*ny+nz*nz);
@@ -105,12 +104,17 @@ public class JRenderer {
 		final double[] x = new double[npoints];
 		final double[] y = new double[npoints];
 		final double[] z = new double[npoints];
-		
+		double minZ = Double.MAX_VALUE;
+		double maxZ = Double.MIN_VALUE;
 		for (int i = 0; i<npoints; i++) {
 			x[i] = (points.getX(i)+sx)*s;
 			y[i] = h - 1 - (points.getY(i)+sy)*s;
 			z[i] = (points.getZ(i)+sz)*s;
+			if (z[i] < minZ) minZ = z[i];
+			if (z[i] > maxZ) maxZ = z[i];
 		}
+		
+//		System.out.println("minZ: "+minZ+" maxZ: "+maxZ);
 		
 		int nmesh = meshes.getLength();
 		
@@ -210,7 +214,7 @@ public class JRenderer {
 		}
 	}
 	
-	private static int getRGB(float gray, ColorSpace cspace) {
+	public static int getRGB(float gray, ColorSpace cspace) {
 		float[] color = {gray};
 		float []frgb = cspace.toRGB(color);
 		int rgb = 0xff000000
@@ -223,6 +227,16 @@ public class JRenderer {
 	public BufferedImage createImage(int srcX, int srcY, int w, int h) {
 		ensureNornamls();
 		
+		int bufW = ibuffer[0].length;
+		int bufH = ibuffer.length;
+		if (srcX < 0) srcX = 0;
+		if (srcY < 0) srcY = 0;
+		if (srcX >= bufW) srcX = bufW-1;
+		if (srcY >= bufH) srcY = bufH-1;
+		
+		if (w+srcX > bufW) w = bufW - srcX;
+		if (h+srcY > bufH) h = bufH-srcY;
+
 		BufferedImage img = new BufferedImage(w, h, BufferedImage.TYPE_USHORT_GRAY);
 		ColorSpace cspace = img.getColorModel().getColorSpace();
 		
@@ -238,10 +252,20 @@ public class JRenderer {
 	
 	public float[][][] getNormals(int srcX, int srcY, int w, int h) {
 		ensureNornamls();
+		int bufW = ibuffer[0].length;
+		int bufH = ibuffer.length;
+		if (srcX < 0) srcX = 0;
+		if (srcY < 0) srcY = 0;
+		if (srcX >= bufW) srcX = bufW-1;
+		if (srcY >= bufH) srcY = bufH-1;
+		
+		if (w+srcX > bufW) w = bufW - srcX;
+		if (h+srcY > bufH) h = bufH-srcY;
+		
 		float[][][] res = new float[3][h][w];
 		for (int y = 0; y<h; y++) for (int x = 0; x<w; x++) {
 			int ni = ibuffer[srcY+y][srcX + x];
-			for (int i=0; i<3; i++) res[i][y][x] = (float)normals[ni][i]; 
+			for (int i=0; i<3; i++) res[i][y][x] = ni>= 0 ? (float)normals[ni][i] : 0; 
 		}
 		return res;
 	}

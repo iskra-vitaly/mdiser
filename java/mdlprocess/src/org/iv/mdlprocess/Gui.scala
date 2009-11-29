@@ -28,7 +28,7 @@ object Gui {
                                      return name.endsWith(".xml");
                                    } 
                                  }); 
-    showFileGui(files.toList);
+    showFileGui(files.toList.sort {(f1,f2)=>f1.getName<f2.getName} );
   }
   
   def createCloseFrame(frame:java.awt.Window) = {
