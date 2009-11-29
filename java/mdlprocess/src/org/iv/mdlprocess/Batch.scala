@@ -46,21 +46,25 @@ object Batch {
   
   def safeMatFiles(n:Normals, dir:File) {
     dir.mkdirs()
-    saveMat(n(0), new File(dir, "x.mat"))
-    saveMat(n(1), new File(dir, "y.mat"))
-    saveMat(n(2), new File(dir, "z.mat"))
+    saveMat(false)(n(0), new File(dir, "x.mat"))
+    saveMat(false)(n(1), new File(dir, "y.mat"))
+    saveMat(false)(n(2), new File(dir, "z.mat"))
+    
+    saveMat(true)(n(0), new File(dir, "x.octa"))
+    saveMat(true)(n(1), new File(dir, "y.octa"))
+    saveMat(true)(n(2), new File(dir, "z.octa"))
   }
   
   @throws(classOf[IOException])
-  def saveMat(n:NormProj, file:File) {
+  def saveMat(octave:Boolean)(n:NormProj, file:File) {
     val out = new PrintWriter(new FileWriter(file))
     try {
-      out.println("[")
+      if (!octave) out.println("[")
       n.foreach(row=>{
         out.print(row.mkString(" "))
-        out.println(";");
+        if (!octave) out.println(";");
       })
-      out.println("]")
+      if (!octave) out.println("]")
     } finally {
       out.close
     }
@@ -154,9 +158,9 @@ object Batch {
     }
     ratioOption = Some(Ratio(1, 1))
     folder.foreach(f=>{
-      processFolder(f.listFiles)
+      processFolder(f.listFiles.toList sort {(f1,f2)=>f1.getName<f2.getName})
       saveMinMaxWidth(new File(f, "minFrontalWidth.int"), new File(f, "maxFrontalWidth.int"))
-      postProcessFolder(f.listFiles)
+      postProcessFolder(f.listFiles.toList sort {(f1,f2)=>f1.getName<f2.getName})
     })
   }
   
