@@ -6,6 +6,7 @@ function bootstrap(dbDir, matDir, output, m, w, h, nb)
   for k=1:m
     subjectName = sprintf("%02d", k);
     subjectDir = sprintf("%s/%s/%s", dbDir, subjectName, matDir);
+    #fprintf("Processing %s...\n", subjectDir);
     normMat = readNorm(subjectDir);
     bMat = calcBasis(normMat);
     normV = normMat(:,:);
@@ -25,7 +26,7 @@ function bootstrap(dbDir, matDir, output, m, w, h, nb)
     observations(:,:) = B(:,x,:);
     bCov(:,:,x) = cov(observations'); # covariance of B for x'th pixel
   endfor
-  save(output, "B", "bMean", "bCov");
+  save(output, "bMean", "bCov");
 end
 
 function showVec(V, w, h)

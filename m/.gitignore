@@ -1,3 +1,2 @@
-#*#
 octave-core
-work/
+work/*.data
