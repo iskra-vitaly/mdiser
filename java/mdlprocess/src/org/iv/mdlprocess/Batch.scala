@@ -62,7 +62,7 @@ object Batch {
       if (!octave) out.println("[")
       n.foreach(row=>{
         out.print(row.mkString(" "))
-        if (!octave) out.println(";");
+        out.println(";");
       })
       if (!octave) out.println("]")
     } finally {
