@@ -1,6 +1,6 @@
 ## analyze bootstap images
 
-function bootstrap(dbDir, matDir, m, w, h, nb)
+function bootstrap(dbDir, matDir, output, m, w, h, nb)
   bTotal = NaN;
   B = zeros(nb, w*h, m);
   for k=1:m
@@ -19,7 +19,13 @@ function bootstrap(dbDir, matDir, m, w, h, nb)
   endfor
   bMean = zeros(nb, w*h);
   bMean = mean(B, 3);
-  C(1) = cov()
+  bCov = zeros(nb, nb, w*h);
+  for x=1:w*h
+    observations = zeros(nb, m);
+    observations(:,:) = B(:,x,:);
+    bCov(:,:,x) = cov(observations'); # covariance of B for x'th pixel
+  endfor
+  save(output, "B", "bMean", "bCov");
 end
 
 function showVec(V, w, h)
