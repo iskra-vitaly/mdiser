@@ -2,6 +2,7 @@
 
 function bootstrap(dbDir, matDir, output, m, w, h, nb)
   bTotal = NaN;
+  nTotal = NaN;
   B = zeros(nb, w*h, m);
   for k=1:m
     subjectName = sprintf("%02d", k);
@@ -16,6 +17,11 @@ function bootstrap(dbDir, matDir, output, m, w, h, nb)
     else
       bTotal = [bTotal bV];
     endif
+    if isnan(nTotal)
+      nTotal = normV;
+    else
+      nTotal = [nTotal normV];
+    endif
     B(:, :, k) = bV;
   endfor
   bMean = zeros(nb, w*h);
@@ -27,6 +33,14 @@ function bootstrap(dbDir, matDir, output, m, w, h, nb)
     bCov(:,:,x) = cov(observations'); # covariance of B for x'th pixel
   endfor
   save(output, "bMean", "bCov");
+  lights = generateLights(2);
+  condCnt = rows(lights);
+  alpha = cell(condCnt, 1);
+  for i=1:condCnt    # IMG = B'*aplha+E
+    IMG = applyLightCond(nTotal, lights{i, 1}, lights{i, 2});
+    [ALPHA, SIGMA, E] = ols(IMG, B');
+    alpha()
+  endfor
 end
 
 function showVec(V, w, h)
