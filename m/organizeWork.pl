@@ -1,6 +1,6 @@
 #!/usr/bin/perl
-use File::Path qw(make_path remove_tree);
 
+use File::Path qw(make_path remove_tree);
 
 $#ARGV >= 1 || die("No enough arguments"); 
 
